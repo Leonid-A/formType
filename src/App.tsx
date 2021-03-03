@@ -138,6 +138,7 @@ function App() {
         <button type="button" className="ml-2 btn btn-success" onClick={addSection}> Add</button>
         <p className="message">{errMessageSection}</p>
       </div>
+
       {personalSection.name ?
           <Personal
               click={(createFieldObj: Obj, section: string)=> addInputField(createFieldObj, section)}
@@ -146,6 +147,7 @@ function App() {
               deleteField={(section, fieldName)=> deleteField(section, fieldName)}
           />
           : null}
+
       {addressSection.name ?
           <Address
               click={(createFieldObj: Obj, section: string)=> addInputField(createFieldObj, section)}
@@ -154,6 +156,7 @@ function App() {
               deleteField={(section, fieldName)=> deleteField(section, fieldName)}
           />
           : null}
+
       {contactsSection.name ?
           <Contacts
               click={(createFieldObj: Obj, section: string)=> addInputField(createFieldObj, section)}
