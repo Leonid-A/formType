@@ -6,43 +6,27 @@ import Personal from "./Components/Personal";
 import Address from "./Components/Address";
 import Contacts from "./Components/Contacts";
 
-
-
-/*interface CustomerProps {
+interface CustomerProps {
   name: string;
-  fields: [];
+  fields: {
+    inputName?: string;
+    inputType?: string
+  }[];
 }
 
-interface newObj {
-  section: []
-}*/
+interface Obj {
+  [key : string]: string;
+}
 
 function App() {
-  //const objName = "customer"
- // const [customerObj, setCustomerObj] = useState({section:[]}
 
   const [errMessageSection, setErrMessageSection] = useState("")
   const [inputSection, setInputSection] = useState("")
-  const [personalSection, setPersonalSection]=useState({name:'' , fields: []})
-  const [addressSection, setAddressSection]=useState({name:'' , fields: []})
-  const [contactsSection, setContactsSection]=useState({name:'' , fields: []})
+  const [personalSection, setPersonalSection]=useState<CustomerProps>({name:'' , fields: []})
+  const [addressSection, setAddressSection]=useState<CustomerProps>({name:'' , fields: []})
+  const [contactsSection, setContactsSection]=useState<CustomerProps>({name:'' , fields: []})
 
-/*  useEffect(()=> {
-    const newCustomerObj = localStorage.getItem(objName)
-    if (newCustomerObj) {
-      setCustomerObj(JSON.parse(newCustomerObj));
-    }
-  },[]);*/
-
- /* const setNewObj = (newObj: newObj ) => {
-    setCustomerObj(newObj);
-    saveInLocalStorage(newObj);
-  }*/
-
-/*  const saveInLocalStorage = (newObj: newObj) => {
-    localStorage.setItem(objName, JSON.stringify(newObj))
-  }*/
-
+  //***** Add new Section to state
   const addSection = () => {
 
     if (inputSection) {
@@ -57,42 +41,88 @@ function App() {
           setContactsSection({name: "Contacts", fields:[]})
           break;
       }
-      /*const newCustomerObj = JSON.parse(JSON.stringify(customerObj));
-      newCustomerObj.section.push({
-        name: inputSection,
-        fields: []
-      });*/
       setErrMessageSection (" ");
-   //   setNewObj(newCustomerObj);
     } else {
       setErrMessageSection (" Type Section Name");
     }
   }
 
+  //***** Take Section Name on input change
   const takeSectionName = (event: { target: {value:string} }) => {
     setInputSection(event.target.value)
   }
 
-const deleteSection = (sectionName: string) => {
-  switch (sectionName) {
-    case "Personal":
-      setPersonalSection({name: '', fields:[]})
-      break;
-    case "Address":
-      setAddressSection({name: '', fields:[]})
-      break;
-    case "Contacts":
-      setContactsSection({name: '', fields:[]})
-      break;
+  //***** Delete Section from state
+  const deleteSection = (sectionName: string) => {
+    switch (sectionName) {
+      case "Personal":
+        setPersonalSection({name: '', fields:[]})
+        break;
+      case "Address":
+        setAddressSection({name: '', fields:[]})
+        break;
+      case "Contacts":
+        setContactsSection({name: '', fields:[]})
+        break;
+    }
   }
-    // const newCustomerObj = JSON.parse(JSON.stringify(customerObj))
 
-    // newCustomerObj.section.map((section: CustomerProps,index : number ) => {
-    //   if (section.name === sectionName) {
-    //     newCustomerObj.section.splice(index,1)
-    //   }
-    // })
-    // setNewObj(newCustomerObj);
+  //***** Add new field to state
+  const addInputField = (createFieldObj:  Obj, section: string) => {
+     let newFieldObj: CustomerProps;
+
+    switch (section) {
+      case "Personal":
+        newFieldObj = JSON.parse(JSON.stringify(personalSection))
+        newFieldObj.fields.push(createFieldObj)
+        setPersonalSection(newFieldObj)
+        break;
+      case "Address":
+        newFieldObj = JSON.parse(JSON.stringify(addressSection))
+        newFieldObj.fields.push(createFieldObj)
+       setAddressSection(newFieldObj)
+        break;
+      case "Contacts":
+        newFieldObj = JSON.parse(JSON.stringify(contactsSection))
+        newFieldObj.fields.push(createFieldObj)
+        setContactsSection(newFieldObj)
+        break;
+    }
+  }
+
+  //***** Delete field from state
+  const deleteField = (section: string, fieldName: string) => {
+    let newFieldObj: CustomerProps
+
+    switch (section) {
+      case "Personal":
+        newFieldObj = JSON.parse(JSON.stringify(personalSection))
+        newFieldObj.fields.map((field, index) => {
+          if (field.inputName === fieldName) {
+            newFieldObj.fields.splice(index,1)
+          }
+        })
+        setPersonalSection(newFieldObj)
+        break;
+      case "Address":
+        newFieldObj = JSON.parse(JSON.stringify(addressSection))
+        newFieldObj.fields.map((field, index) => {
+          if (field.inputName === fieldName) {
+            newFieldObj.fields.splice(index,1)
+          }
+        })
+        setAddressSection(newFieldObj)
+        break;
+      case "Contacts":
+        newFieldObj = JSON.parse(JSON.stringify(contactsSection))
+        newFieldObj.fields.map((field, index) => {
+          if (field.inputName === fieldName) {
+            newFieldObj.fields.splice(index,1)
+          }
+        })
+        setContactsSection(newFieldObj)
+        break;
+    }
   }
 
   return (
@@ -108,9 +138,30 @@ const deleteSection = (sectionName: string) => {
         <button type="button" className="ml-2 btn btn-success" onClick={addSection}> Add</button>
         <p className="message">{errMessageSection}</p>
       </div>
-      {personalSection.name ? <Personal name={personalSection.name} delete={() => deleteSection(personalSection.name)}/> : null}
-      {addressSection.name ? <Personal name={addressSection.name} delete={() => deleteSection(addressSection.name)}/> : null}
-      {contactsSection.name ? <Personal name={contactsSection.name} delete={() => deleteSection(contactsSection.name)}/> : null}
+      {personalSection.name ?
+          <Personal
+              click={(createFieldObj: Obj, section: string)=> addInputField(createFieldObj, section)}
+              sectObj={personalSection}
+              delete={() => deleteSection(personalSection.name)}
+              deleteField={(section, fieldName)=> deleteField(section, fieldName)}
+          />
+          : null}
+      {addressSection.name ?
+          <Address
+              click={(createFieldObj: Obj, section: string)=> addInputField(createFieldObj, section)}
+              sectObj={addressSection}
+              delete={() => deleteSection(addressSection.name)}
+              deleteField={(section, fieldName)=> deleteField(section, fieldName)}
+          />
+          : null}
+      {contactsSection.name ?
+          <Contacts
+              click={(createFieldObj: Obj, section: string)=> addInputField(createFieldObj, section)}
+              sectObj={contactsSection}
+              delete={() => deleteSection(contactsSection.name)}
+              deleteField={(section, fieldName)=> deleteField(section, fieldName)}
+          />
+          : null}
 
     </div>
   );
